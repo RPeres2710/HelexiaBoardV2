@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento Helexia - Movisafe AMLAT</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #004d40;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        .search-container input {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .search-container button {
+            padding: 5px 10px;
+            border: none;
+            background-color: #00897b;
+            color: white;
+            cursor: pointer;
+        }
+
+        #container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+        }
+
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1>Monitoramento Helexia - Movisafe AMLAT</h1>
+            <div class="search-container">
+                <input type="text" id="search-box" placeholder="Pesquisar localização..." />
+                <button id="search-btn">Pesquisar</button>
+            </div>
+        </div>
+    </header>
+    
+    <div id="container">
+        <div id="map"></div>
+        <iframe id="google-maps" src="https://www.google.com/maps/d/u/0/embed?mid=16L6cT8gf9xuFW-QUGsWbD8dh9vUTpGs&ehbc=2E312F&noprof=1"></iframe>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const locations = [
+            { name: "Alto Paraná", lat: -23.1286, lng: -52.3136 },
+            { name: "Bacuri", lat: -19.058, lng: -51.191 },
+            { name: "Barro Branco", lat: -19.058, lng: -51.192 },
+            { name: "Caatinga 01", lat: -4.1833, lng: -38.1333 },
+            { name: "Caatinga 02", lat: -4.1333, lng: -38.2667 },
+            { name: "Caatinga 15", lat: -4.8333, lng: -37.8 },
+            { name: "Caatinga 23", lat: -4.1833, lng: -38.1333 },
+            { name: "Cassilândia", lat: -19.117, lng: -51.733 },
+            { name: "Cidade Gaúcha", lat: -23.3736, lng: -52.9433 },
+            { name: "Euclides da Cunha", lat: -22.5894, lng: -52.5911 },
+            { name: "Iguaraçu", lat: -23.1947, lng: -51.8211 },
+            { name: "Loanda", lat: -22.9236, lng: -53.1361 },
+            { name: "Munhoz de Melo", lat: -23.1478, lng: -51.7733 },
+            { name: "Nova Esperança", lat: -23.1847, lng: -52.2033 },
+            { name: "Paraíso das Águas", lat: -19.022, lng: -53.011 },
+            { name: "Paranaíba", lat: -19.6747, lng: -51.1903 },
+            { name: "Pequi 1", lat: -16.8267, lng: -49.2283 },
+            { name: "Pequi 2", lat: -16.9633, lng: -49.2592 },
+            { name: "Pinheiros 03", lat: -22.0994, lng: -49.4383 },
+            { name: "Pinheiros 07", lat: -21.2611, lng: -50.6461 },
+            { name: "Pipa 01 e 02", lat: -5.4547, lng: -37.5222 },
+            { name: "Pres. Venceslau", lat: -21.8783, lng: -51.8444 },
+            { name: "Rolim de Moura 1 e 2", lat: -11.7278, lng: -61.7714 },
+            { name: "São Jeronimo 1", lat: -29.9592, lng: -51.725 },
+            { name: "Serra do Mar 03", lat: -22.7303, lng: -45.1242 },
+            { name: "Serra do Mar 04", lat: -22.5778, lng: -44.9592 },
+            { name: "Serra do Mar 06", lat: -23.1, lng: -45.7 },
+            { name: "Serra do Mar 07 e 26", lat: -22.7303, lng: -45.1242 },
+            { name: "Taquarituba 1 e 2", lat: -23.5336, lng: -49.2456 }
+        ];
+
+        const map = L.map('map').setView([-15.7801, -47.9292], 4); 
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        let markers = [];
+
+        locations.forEach(location => {
+            const marker = L.circleMarker([location.lat, location.lng], {
+                radius: 10,
+                color: "#00897b",
+                fillColor: "#00897b",
+                fillOpacity: 1
+            }).addTo(map);
+
+            markers.push({ marker, name: location.name, lat: location.lat, lng: location.lng });
+
+            marker.on('mouseover', function () {
+                this.setStyle({ fillColor: "#ffcc00", color: "#ffcc00" });
+                this.bindTooltip(location.name, { permanent: false, direction: "top" }).openTooltip();
+            });
+
+            marker.on('mouseout', function () {
+                this.setStyle({ fillColor: "#00897b", color: "#00897b" });
+            });
+
+            marker.on('click', function () {
+                document.getElementById("google-maps").src = `https://www.google.com/maps/d/u/0/embed?mid=16L6cT8gf9xuFW-QUGsWbD8dh9vUTpGs&ll=${location.lat},${location.lng}&z=10`;
+                map.setView([location.lat, location.lng], 10);
+            });
+        });
+
+        document.getElementById("search-btn").addEventListener("click", function () {
+            const searchTerm = document.getElementById("search-box").value.toLowerCase();
+            const foundLocation = markers.find(loc => loc.name.toLowerCase().includes(searchTerm));
+
+            if (foundLocation) {
+                map.setView([foundLocation.lat, foundLocation.lng], 10);
+                foundLocation.marker.setStyle({ fillColor: "#ffcc00", color: "#ffcc00" });
+                document.getElementById("google-maps").src = `https://www.google.com/maps/d/u/0/embed?mid=16L6cT8gf9xuFW-QUGsWbD8dh9vUTpGs&ll=${foundLocation.lat},${foundLocation.lng}&z=10`;
+            } else {
+                alert("Local não encontrado!");
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
