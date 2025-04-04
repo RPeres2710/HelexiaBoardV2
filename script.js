@@ -30,7 +30,7 @@ const locations = [
     { name: "Taquarituba 1 e 2", lat: -23.5289, lng: -49.2456 }
 ];
 
-const map = L.map('map').setView([-15.7801, -47.9292], 4); 
+const map = L.map('map').setView([-15.7801, -47.9292], 4);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
@@ -85,4 +85,11 @@ document.getElementById("search-btn").addEventListener("click", function () {
 // Botão para fechar o painel lateral
 document.getElementById("close-panel").addEventListener("click", function () {
     document.getElementById("info-panel").style.display = "none";
+});
+
+// Garante que o painel lateral possa ser fechado com ESC
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        document.getElementById("info-panel").style.display = "none";
+    }
 });
